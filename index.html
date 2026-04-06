@@ -1,0 +1,695 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>USHCC Priority Ranking — Hispanic Chamber Legislative Committee</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --burgundy: hsl(7, 65%, 30%);
+    --burgundy-light: hsl(7, 65%, 42%);
+    --burgundy-pale: hsl(7, 45%, 95%);
+    --gold: hsl(42, 45%, 48%);
+    --gold-light: hsl(42, 55%, 62%);
+    --gold-pale: hsl(42, 45%, 96%);
+    --navy: hsl(214, 45%, 24%);
+    --navy-light: hsl(214, 35%, 38%);
+    --cream: hsl(42, 20%, 97%);
+    --text: hsl(214, 30%, 18%);
+    --text-muted: hsl(214, 15%, 50%);
+    --border: hsl(214, 15%, 88%);
+    --white: #fff;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--cream);
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  .page-header {
+    background: var(--navy);
+    padding: 2.5rem 1.5rem 2rem;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .page-header::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: repeating-linear-gradient(
+      45deg,
+      transparent,
+      transparent 40px,
+      hsla(42, 45%, 48%, 0.04) 40px,
+      hsla(42, 45%, 48%, 0.04) 41px
+    );
+  }
+
+  .header-eyebrow {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--gold-light);
+    margin-bottom: 10px;
+    position: relative;
+  }
+
+  .header-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(22px, 5vw, 32px);
+    font-weight: 600;
+    color: var(--white);
+    line-height: 1.2;
+    position: relative;
+    margin-bottom: 10px;
+  }
+
+  .header-sub {
+    font-size: 14px;
+    color: hsla(42, 80%, 85%, 0.85);
+    font-weight: 300;
+    position: relative;
+  }
+
+  .gold-rule {
+    width: 48px;
+    height: 2px;
+    background: var(--gold);
+    margin: 14px auto;
+    position: relative;
+  }
+
+  .container {
+    max-width: 620px;
+    margin: 0 auto;
+    padding: 2rem 1.25rem 4rem;
+  }
+
+  .instruction-card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--gold);
+    border-radius: 8px;
+    padding: 14px 16px;
+    margin-bottom: 1.5rem;
+    font-size: 13.5px;
+    color: var(--text-muted);
+    line-height: 1.6;
+  }
+
+  .instruction-card strong {
+    color: var(--text);
+    font-weight: 500;
+  }
+
+  /* Voting view */
+  #list { margin-bottom: 1.25rem; }
+
+  .priority-item {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 16px;
+    margin-bottom: 10px;
+    cursor: grab;
+    transition: box-shadow 0.15s, border-color 0.15s, transform 0.1s;
+    user-select: none;
+    touch-action: none;
+  }
+
+  .priority-item:hover {
+    border-color: var(--gold);
+    box-shadow: 0 2px 12px hsla(214, 45%, 24%, 0.08);
+  }
+
+  .priority-item.dragging {
+    opacity: 0.35;
+    transform: scale(0.98);
+  }
+
+  .priority-item.drag-over {
+    border-color: var(--burgundy);
+    background: var(--burgundy-pale);
+  }
+
+  .rank-badge {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 500;
+    flex-shrink: 0;
+    border: 1.5px solid var(--border);
+    color: var(--text-muted);
+    background: var(--cream);
+    transition: background 0.2s, border-color 0.2s, color 0.2s;
+  }
+
+  .priority-item.rank-1 .rank-badge { background: var(--burgundy); border-color: var(--burgundy); color: #fff; }
+  .priority-item.rank-2 .rank-badge { background: var(--gold); border-color: var(--gold); color: #fff; }
+  .priority-item.rank-3 .rank-badge { background: var(--navy); border-color: var(--navy); color: #fff; }
+  .priority-item.rank-4 .rank-badge { background: hsl(7, 40%, 55%); border-color: hsl(7, 40%, 55%); color: #fff; }
+  .priority-item.rank-5 .rank-badge { background: hsl(42, 40%, 62%); border-color: hsl(42, 40%, 62%); color: #fff; }
+  .priority-item.rank-6 .rank-badge { background: hsl(214, 30%, 48%); border-color: hsl(214, 30%, 48%); color: #fff; }
+  .priority-item.rank-7 .rank-badge { background: hsl(150, 30%, 45%); border-color: hsl(150, 30%, 45%); color: #fff; }
+
+  .priority-content { flex: 1; min-width: 0; }
+
+  .priority-name {
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--text);
+    margin-bottom: 2px;
+  }
+
+  .priority-sub {
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+
+  .drag-handle {
+    color: var(--border);
+    font-size: 18px;
+    line-height: 1;
+    flex-shrink: 0;
+    transition: color 0.15s;
+  }
+
+  .priority-item:hover .drag-handle { color: var(--text-muted); }
+
+  .submit-btn {
+    width: 100%;
+    padding: 14px;
+    background: var(--burgundy);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.15s;
+    letter-spacing: 0.01em;
+  }
+
+  .submit-btn:hover { background: var(--burgundy-light); }
+
+  /* Results view */
+  .results-section { }
+
+  .result-item { margin-bottom: 18px; }
+
+  .result-header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    margin-bottom: 5px;
+    gap: 8px;
+  }
+
+  .result-left { display: flex; align-items: baseline; gap: 10px; flex: 1; min-width: 0; }
+
+  .result-pos {
+    font-family: 'Playfair Display', serif;
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--burgundy);
+    flex-shrink: 0;
+    width: 28px;
+  }
+
+  .result-name {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .result-pts {
+    font-size: 12px;
+    color: var(--text-muted);
+    flex-shrink: 0;
+  }
+
+  .bar-track {
+    height: 6px;
+    background: var(--border);
+    border-radius: 3px;
+    overflow: hidden;
+    margin-left: 38px;
+  }
+
+  .bar-fill {
+    height: 100%;
+    border-radius: 3px;
+    transition: width 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+    background: var(--burgundy);
+  }
+
+  .results-meta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .votes-label {
+    font-size: 13px;
+    color: var(--text-muted);
+  }
+
+  .votes-count {
+    font-size: 20px;
+    font-family: 'Playfair Display', serif;
+    font-weight: 600;
+    color: var(--burgundy);
+    margin-right: 6px;
+  }
+
+  .change-vote-btn {
+    font-size: 13px;
+    color: var(--navy-light);
+    background: none;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 6px 12px;
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    transition: background 0.15s;
+  }
+
+  .change-vote-btn:hover { background: var(--cream); }
+
+  .share-box {
+    background: var(--navy);
+    border-radius: 10px;
+    padding: 18px 20px;
+    margin-top: 2rem;
+    text-align: center;
+  }
+
+  .share-box p {
+    font-size: 13px;
+    color: hsla(42, 80%, 85%, 0.85);
+    margin-bottom: 10px;
+    font-weight: 300;
+  }
+
+  .share-url {
+    background: hsla(214, 45%, 18%, 1);
+    border: 1px solid hsla(214, 35%, 40%, 0.5);
+    border-radius: 6px;
+    padding: 9px 12px;
+    font-size: 12px;
+    color: var(--gold-light);
+    font-family: monospace;
+    word-break: break-all;
+    margin-bottom: 10px;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+
+  .share-url:hover { background: hsla(214, 45%, 22%, 1); }
+
+  .copy-btn {
+    background: var(--gold);
+    color: var(--navy);
+    border: none;
+    border-radius: 6px;
+    padding: 8px 20px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+
+  .copy-btn:hover { background: var(--gold-light); }
+
+  .copied-msg {
+    font-size: 12px;
+    color: var(--gold-light);
+    margin-top: 6px;
+    display: none;
+  }
+
+  .thank-you {
+    font-family: 'Playfair Display', serif;
+    font-size: 20px;
+    color: var(--burgundy);
+    margin-bottom: 6px;
+  }
+
+  .thank-sub {
+    font-size: 13px;
+    color: var(--text-muted);
+    margin-bottom: 1.5rem;
+  }
+
+  .footer {
+    text-align: center;
+    margin-top: 3rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border);
+    font-size: 11px;
+    color: var(--text-muted);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  @media (max-width: 480px) {
+    .priority-name { font-size: 14px; }
+    .priority-item { padding: 12px 14px; gap: 12px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <div class="header-eyebrow">Hispanic Chamber of Commerce · Legislative Committee</div>
+  <h1 class="header-title">2025 Legislative Priorities</h1>
+  <div class="gold-rule"></div>
+  <p class="header-sub">Committee Ranking Poll</p>
+</div>
+
+<div class="container">
+  <div class="instruction-card">
+    <strong>How to vote:</strong> Drag the priorities below to rank them from most to least important, then click Submit. Results update in real time for everyone.
+  </div>
+
+  <div id="voting-view">
+    <div id="list"></div>
+    <button class="submit-btn" onclick="submitVote()">Submit my ranking →</button>
+  </div>
+
+  <div id="results-view" style="display:none">
+    <p class="thank-you">Thank you!</p>
+    <p class="thank-sub">Your ranking has been recorded.</p>
+
+    <div class="results-meta">
+      <div>
+        <span class="votes-count" id="vote-count">0</span>
+        <span class="votes-label">votes submitted</span>
+      </div>
+      <button class="change-vote-btn" onclick="changeVote()">Change my vote</button>
+    </div>
+
+    <div class="results-section" id="results-list"></div>
+
+    <div class="share-box">
+      <p>Share this poll with your committee members</p>
+      <div class="share-url" id="share-url" onclick="copyUrl()">Loading...</div>
+      <button class="copy-btn" onclick="copyUrl()">Copy link</button>
+      <p class="copied-msg" id="copied-msg">Copied to clipboard!</p>
+    </div>
+  </div>
+
+  <div class="footer">Hispanic Chamber of Commerce in St. Louis &nbsp;·&nbsp; Legislative Committee</div>
+</div>
+
+<script>
+const PRIORITIES = [
+  { id: 'capital', name: 'Access to capital & small business growth', sub: 'Loans, grants, SBA access · minority business funding · financial literacy' },
+  { id: 'workforce', name: 'Workforce development & education', sub: 'Job training, apprenticeships · bilingual workforce integration' },
+  { id: 'immigration', name: 'Immigration reform (business-focused)', sub: 'Legal workforce stability · work authorization · DACA/TPS support' },
+  { id: 'tax', name: 'Tax & regulatory relief', sub: 'Reduce burdens on small businesses · simplify compliance · pro-growth policies' },
+  { id: 'procurement', name: 'Government contracts & supplier diversity', sub: 'Federal/state procurement · minority certifications · equity in contracting' },
+  { id: 'infrastructure', name: 'Infrastructure & economic development', sub: 'Transportation, broadband, energy · supply chain improvements' },
+  { id: 'trade', name: 'International trade & market expansion', sub: 'Export opportunities · USMCA · cross-border business growth' },
+];
+
+const STORAGE_KEY = 'ushcc_poll_votes_v2';
+const VOTED_KEY = 'ushcc_poll_voted_v2';
+
+let order = PRIORITIES.map(p => p.id);
+let votes = {};
+let myVoteId = null;
+
+function loadVotes() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) votes = JSON.parse(raw);
+  } catch(e) { votes = {}; }
+}
+
+function saveVotes() {
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(votes)); } catch(e) {}
+}
+
+function hasVoted() {
+  return !!localStorage.getItem(VOTED_KEY);
+}
+
+function setVoted(id) {
+  try { localStorage.setItem(VOTED_KEY, id); } catch(e) {}
+}
+
+function clearVoted() {
+  try { localStorage.removeItem(VOTED_KEY); } catch(e) {}
+}
+
+function getMyVoteId() {
+  return localStorage.getItem(VOTED_KEY);
+}
+
+// --- Render voting ---
+function renderVoting() {
+  document.getElementById('voting-view').style.display = '';
+  document.getElementById('results-view').style.display = 'none';
+  renderList();
+}
+
+function renderList() {
+  const list = document.getElementById('list');
+  list.innerHTML = '';
+  order.forEach((id, i) => {
+    const p = PRIORITIES.find(x => x.id === id);
+    const div = document.createElement('div');
+    div.className = `priority-item rank-${i+1}`;
+    div.dataset.id = id;
+    div.draggable = true;
+    div.innerHTML = `
+      <div class="rank-badge">${i+1}</div>
+      <div class="priority-content">
+        <div class="priority-name">${p.name}</div>
+        <div class="priority-sub">${p.sub}</div>
+      </div>
+      <div class="drag-handle">⠿</div>
+    `;
+    list.appendChild(div);
+  });
+  attachDragEvents();
+  attachTouchEvents();
+}
+
+let dragSrcId = null;
+
+function attachDragEvents() {
+  document.querySelectorAll('.priority-item').forEach(el => {
+    el.addEventListener('dragstart', e => {
+      dragSrcId = el.dataset.id;
+      setTimeout(() => el.classList.add('dragging'), 0);
+    });
+    el.addEventListener('dragend', () => {
+      el.classList.remove('dragging');
+      document.querySelectorAll('.priority-item').forEach(i => i.classList.remove('drag-over'));
+    });
+    el.addEventListener('dragover', e => { e.preventDefault(); el.classList.add('drag-over'); });
+    el.addEventListener('dragleave', () => el.classList.remove('drag-over'));
+    el.addEventListener('drop', e => {
+      e.preventDefault();
+      el.classList.remove('drag-over');
+      if (dragSrcId && dragSrcId !== el.dataset.id) {
+        const from = order.indexOf(dragSrcId);
+        const to = order.indexOf(el.dataset.id);
+        order.splice(from, 1);
+        order.splice(to, 0, dragSrcId);
+        renderList();
+      }
+    });
+  });
+}
+
+// Touch drag support
+let touchDragEl = null, touchClone = null, touchStartY = 0;
+
+function attachTouchEvents() {
+  document.querySelectorAll('.priority-item').forEach(el => {
+    el.addEventListener('touchstart', e => {
+      touchDragEl = el;
+      touchStartY = e.touches[0].clientY;
+      touchClone = el.cloneNode(true);
+      touchClone.style.cssText = `position:fixed;left:${el.getBoundingClientRect().left}px;top:${el.getBoundingClientRect().top}px;width:${el.offsetWidth}px;opacity:0.85;z-index:999;pointer-events:none;border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,0.15);`;
+      document.body.appendChild(touchClone);
+      el.classList.add('dragging');
+    }, { passive: true });
+
+    el.addEventListener('touchmove', e => {
+      if (!touchDragEl || !touchClone) return;
+      e.preventDefault();
+      const touch = e.touches[0];
+      const dy = touch.clientY - touchStartY;
+      touchClone.style.top = (touchDragEl.getBoundingClientRect().top + dy) + 'px';
+      const items = [...document.querySelectorAll('.priority-item:not(.dragging)')];
+      items.forEach(i => i.classList.remove('drag-over'));
+      const target = items.find(i => {
+        const r = i.getBoundingClientRect();
+        return touch.clientY > r.top && touch.clientY < r.bottom;
+      });
+      if (target) target.classList.add('drag-over');
+    }, { passive: false });
+
+    el.addEventListener('touchend', e => {
+      if (!touchDragEl) return;
+      const items = [...document.querySelectorAll('.priority-item')];
+      items.forEach(i => i.classList.remove('drag-over'));
+      const touch = e.changedTouches[0];
+      const target = items.find(i => {
+        const r = i.getBoundingClientRect();
+        return touch.clientY > r.top && touch.clientY < r.bottom && i !== touchDragEl;
+      });
+      if (target) {
+        const from = order.indexOf(touchDragEl.dataset.id);
+        const to = order.indexOf(target.dataset.id);
+        order.splice(from, 1);
+        order.splice(to, 0, touchDragEl.dataset.id);
+      }
+      if (touchClone) { touchClone.remove(); touchClone = null; }
+      touchDragEl.classList.remove('dragging');
+      touchDragEl = null;
+      renderList();
+    });
+  });
+}
+
+// --- Submit ---
+function submitVote() {
+  const id = 'v_' + Date.now() + '_' + Math.random().toString(36).slice(2, 7);
+  votes[id] = [...order];
+  saveVotes();
+  setVoted(id);
+  renderResults();
+}
+
+function changeVote() {
+  const myId = getMyVoteId();
+  if (myId && votes[myId]) {
+    delete votes[myId];
+    saveVotes();
+  }
+  clearVoted();
+  renderVoting();
+}
+
+// --- Results ---
+function computeScores() {
+  const scores = {};
+  PRIORITIES.forEach(p => scores[p.id] = 0);
+  Object.values(votes).forEach(ranking => {
+    ranking.forEach((id, i) => {
+      scores[id] += (PRIORITIES.length - i);
+    });
+  });
+  return scores;
+}
+
+function renderResults() {
+  document.getElementById('voting-view').style.display = 'none';
+  document.getElementById('results-view').style.display = '';
+
+  const n = Object.keys(votes).length;
+  document.getElementById('vote-count').textContent = n;
+
+  const scores = computeScores();
+  const sorted = [...PRIORITIES].sort((a, b) => scores[b.id] - scores[a.id]);
+  const maxScore = scores[sorted[0].id] || 1;
+
+  const posColors = ['var(--burgundy)', 'var(--gold)', 'var(--navy)', 'hsl(7,40%,55%)', 'hsl(42,40%,62%)', 'hsl(214,30%,48%)', 'hsl(150,30%,45%)'];
+  const list = document.getElementById('results-list');
+  list.innerHTML = sorted.map((p, i) => {
+    const pct = Math.round((scores[p.id] / maxScore) * 100);
+    return `<div class="result-item">
+      <div class="result-header">
+        <div class="result-left">
+          <span class="result-pos" style="color:${posColors[i]}">${i + 1}</span>
+          <span class="result-name">${p.name}</span>
+        </div>
+        <span class="result-pts">${scores[p.id]} pts</span>
+      </div>
+      <div class="bar-track">
+        <div class="bar-fill" style="width: 0%; background:${posColors[i]}" data-pct="${pct}"></div>
+      </div>
+    </div>`;
+  }).join('');
+
+  setTimeout(() => {
+    document.querySelectorAll('.bar-fill').forEach(el => {
+      el.style.width = el.dataset.pct + '%';
+    });
+  }, 100);
+
+  const url = window.location.href.split('?')[0];
+  document.getElementById('share-url').textContent = url;
+}
+
+function copyUrl() {
+  const url = window.location.href.split('?')[0];
+  navigator.clipboard.writeText(url).then(() => {
+    const msg = document.getElementById('copied-msg');
+    msg.style.display = 'block';
+    setTimeout(() => msg.style.display = 'none', 2500);
+  }).catch(() => {
+    document.getElementById('share-url').select && document.getElementById('share-url').select();
+  });
+}
+
+// --- Init ---
+loadVotes();
+if (hasVoted()) {
+  renderResults();
+} else {
+  renderVoting();
+}
+
+// Auto-refresh results every 15s if on results view
+setInterval(() => {
+  loadVotes();
+  if (hasVoted() && document.getElementById('results-view').style.display !== 'none') {
+    const n = Object.keys(votes).length;
+    document.getElementById('vote-count').textContent = n;
+    const scores = computeScores();
+    const sorted = [...PRIORITIES].sort((a, b) => scores[b.id] - scores[a.id]);
+    const maxScore = scores[sorted[0].id] || 1;
+    document.querySelectorAll('.result-item').forEach((el, i) => {
+      const bar = el.querySelector('.bar-fill');
+      const pts = el.querySelector('.result-pts');
+      if (bar && pts && sorted[i]) {
+        const pct = Math.round((scores[sorted[i].id] / maxScore) * 100);
+        bar.style.width = pct + '%';
+        pts.textContent = scores[sorted[i].id] + ' pts';
+      }
+    });
+  }
+}, 15000);
+</script>
+</body>
+</html>
